@@ -8,9 +8,10 @@ import CollectionsOverviewContainer from '../../components/collections-overview/
 import CollectionPageContainer from '../collection/collection.container';
 
 class ShopPage extends React.Component {
-  componentDidMount() {
-    const { fetchCollectionsStartAsync } = this.props;
-    fetchCollectionsStartAsync();
+  constructor(props) {
+    super(props);
+
+    props.fetchCollectionsStartAsync();
   }
 
   render() {
