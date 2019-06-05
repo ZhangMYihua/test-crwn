@@ -6,8 +6,13 @@ import {
   createUserProfileDocument,
   getCurrentUser
 } from '../../firebase/firebase.utils';
-import { UserActionTypes } from './user.types';
-import { signInSuccess, signInFailure } from './user.actions';
+import UserActionTypes from './user.types';
+import {
+  signInSuccess,
+  signInFailure,
+  signOutSuccess,
+  signOutFailure
+} from './user.actions';
 
 export function* getSnapshotFromUserAuth(userAuth) {
   try {
@@ -22,7 +27,7 @@ export function* getSnapshotFromUserAuth(userAuth) {
 export function* signInWithGoogle() {
   try {
     const { user } = yield auth.signInWithPopup(googleProvider);
-    yield* getSnapshotFromUserAuth(user);
+    yield getSnapshotFromUserAuth(user);
   } catch (error) {
     yield put(signInFailure(error));
   }
@@ -31,7 +36,7 @@ export function* signInWithGoogle() {
 export function* signInWithEmail({ payload: { email, password } }) {
   try {
     const { user } = yield auth.signInWithEmailAndPassword(email, password);
-    yield* getSnapshotFromUserAuth(user);
+    yield getSnapshotFromUserAuth(user);
   } catch (error) {
     yield put(signInFailure(error));
   }
@@ -40,9 +45,19 @@ export function* signInWithEmail({ payload: { email, password } }) {
 export function* isUserAuthenticated() {
   try {
     const userAuth = yield getCurrentUser();
-    yield* getSnapshotFromUserAuth(userAuth);
+    if (!userAuth) return;
+    yield getSnapshotFromUserAuth(userAuth);
   } catch (error) {
     yield put(signInFailure(error));
+  }
+}
+
+export function* signOut() {
+  try {
+    yield auth.signOut();
+    yield put(signOutSuccess());
+  } catch (error) {
+    yield put(signOutFailure(error));
   }
 }
 
@@ -58,10 +73,15 @@ export function* checkUserSession() {
   yield takeLatest(UserActionTypes.CHECK_USER_SESSION, isUserAuthenticated);
 }
 
+export function* onSignOutStart() {
+  yield takeLatest(UserActionTypes.SIGN_OUT_START, signOut);
+}
+
 export function* userSagas() {
   yield all([
     call(onEmailSignInStart),
     call(onGoogleSignInStart),
-    call(checkUserSession)
+    call(checkUserSession),
+    call(onSignOutStart)
   ]);
 }
