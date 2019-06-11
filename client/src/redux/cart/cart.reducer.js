@@ -3,7 +3,8 @@ import { addItemToCart, removeItemFromCart } from './cart.utils';
 
 const INITIAL_STATE = {
   hidden: true,
-  cartItems: []
+  cartItems: [],
+  error: null
 };
 
 const cartReducer = (state = INITIAL_STATE, action) => {
@@ -29,6 +30,18 @@ const cartReducer = (state = INITIAL_STATE, action) => {
         cartItems: state.cartItems.filter(
           cartItem => cartItem.id !== action.payload.id
         )
+      };
+    case CartActionTypes.FETCH_CART_SUCCESS:
+      return {
+        ...state,
+        cartItems: action.payload,
+        error: null
+      };
+    case CartActionTypes.UPDATE_CART_FAILURE:
+    case CartActionTypes.FETCH_CART_FAILURE:
+      return {
+        ...state,
+        error: action.payload
       };
     case CartActionTypes.CLEAR_CART:
       return {
