@@ -4,9 +4,9 @@ import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { ApolloProvider } from 'react-apollo';
-import { ApolloClient } from 'apollo-client';
 import { createHttpLink } from 'apollo-link-http';
 import { InMemoryCache } from 'apollo-cache-inmemory';
+import { ApolloClient } from 'apollo-boost';
 
 import { store, persistor } from './redux/store';
 
@@ -23,14 +23,14 @@ const client = new ApolloClient({
 });
 
 ReactDOM.render(
-  <ApolloProvider client={client}>
-    <Provider store={store}>
-      <BrowserRouter>
+  <BrowserRouter>
+    <ApolloProvider client={client}>
+      <Provider store={store}>
         <PersistGate persistor={persistor}>
           <App />
         </PersistGate>
-      </BrowserRouter>
-    </Provider>
-  </ApolloProvider>,
+      </Provider>
+    </ApolloProvider>
+  </BrowserRouter>,
   document.getElementById('root')
 );
