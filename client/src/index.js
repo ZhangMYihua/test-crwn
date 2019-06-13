@@ -1,26 +1,58 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { BrowserRouter } from 'react-router-dom';
-import { Provider } from 'react-redux';
-import { PersistGate } from 'redux-persist/integration/react';
-import { ApolloProvider } from 'react-apollo';
-import { createHttpLink } from 'apollo-link-http';
-import { InMemoryCache } from 'apollo-cache-inmemory';
-import { ApolloClient } from 'apollo-boost';
+import React from "react";
+import ReactDOM from "react-dom";
+import { BrowserRouter } from "react-router-dom";
+import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
+import { ApolloProvider } from "react-apollo";
+import { createHttpLink } from "apollo-link-http";
+import { InMemoryCache } from "apollo-cache-inmemory";
+import { ApolloClient, gql } from "apollo-boost";
 
-import { store, persistor } from './redux/store';
+import { store, persistor } from "./redux/store";
 
-import './index.css';
-import App from './App';
+import "./index.css";
+import App from "./App";
 
 const httpLink = createHttpLink({
-  uri: 'https://hasura.crwn-clothing.com/v1/graphql'
+  uri: "https://hasura.crwn-clothing.com/v1/graphql"
 });
 
 const client = new ApolloClient({
   link: httpLink,
   cache: new InMemoryCache()
 });
+
+// client.mutate({
+//   mutation: gql`
+//     mutation {
+//       insert_collection(objects: [{ title: "test" }]) {
+//         returning {
+//           id
+//           title
+//         }
+//       }
+//     }
+//   `
+// }).then(res => console.log(res));
+
+client
+  .query({
+    query: gql`
+      {
+        collection {
+          id
+          title
+          items {
+            id
+            name
+            imageUrl
+            price
+          }
+        }
+      }
+    `
+  })
+  .then(res => console.log(res));
 
 ReactDOM.render(
   <BrowserRouter>
@@ -32,5 +64,5 @@ ReactDOM.render(
       </Provider>
     </ApolloProvider>
   </BrowserRouter>,
-  document.getElementById('root')
+  document.getElementById("root")
 );
