@@ -29,6 +29,7 @@ export const TextContainer = styled.span`
 
   @media screen and (max-width: 800px) {
     width: 22%;
+    padding-right: 10px;
   }
 `;
 
